@@ -1,9 +1,12 @@
 package ru.pimalex78;
 
+import org.xml.sax.SAXException;
 import ru.pimalex78.entities.Box;
 import ru.pimalex78.entities.Item;
 import ru.pimalex78.parser.XMLParser;
 
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
 import java.sql.*;
 import java.util.List;
 
@@ -49,7 +52,13 @@ public class MainApp {
         ClassLoader classLoader = MainApp.class.getClassLoader();
         String fileName = classLoader.getResource("Storage.xml").getPath();
 
-        xmlParser.parseXML(fileName);
+        try {
+            xmlParser.parseXML(fileName);
+        } catch (ParserConfigurationException | IOException e) {
+            e.printStackTrace();
+        } catch (SAXException e) {
+            e.printStackTrace();
+        }
 
 
         try (Connection connection = DriverManager.getConnection("jdbc:h2:~/test", "root", "")) {
@@ -61,11 +70,12 @@ public class MainApp {
 
                 List<Box> boxes = xmlParser.getBoxes();
                 for (Box box : boxes) {
-                    dataQuery.executeUpdate("INSERT INTO BOX (id) VALUES (" + box.getId() + ");");
+                    dataQuery.executeUpdate("INSERT INTO BOX (id, contained_in) VALUES (" + box.getId() + ", " + box.getParentId() + ");");
                 }
                 List<Item> items = xmlParser.getItems();
                 for (Item item : items) {
-                    dataQuery.executeUpdate("INSERT INTO ITEM (id, color) VALUES (" + item.getId() + "," + "'" + item.getColor() + "'" + ");");
+                    dataQuery.executeUpdate("INSERT INTO ITEM (id, contained_in, color) VALUES (" + item.getId() + ","
+                            + item.getParentId() + "," + "'" + item.getColor() + "'" + ");");
                 }
             }
 
