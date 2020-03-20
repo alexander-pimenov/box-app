@@ -42,7 +42,13 @@ public class MainApp {
     public static void main(final String[] args) {
 
         XMLParser xmlParser = new XMLParser();
-        String fileName = "C:/projects/box-app/src/main/resources/Storage.xml";
+
+        //String fileName = "C:/projects/box-app/src/main/resources/Storage.xml";
+
+        //Получим путь к нашему xml файлу Storage.xml
+        ClassLoader classLoader = MainApp.class.getClassLoader();
+        String fileName = classLoader.getResource("Storage.xml").getPath();
+
         xmlParser.parseXML(fileName);
 
 
